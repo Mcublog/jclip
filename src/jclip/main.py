@@ -44,7 +44,7 @@ def jira_attach_file(jira: JIRA, issue: Issue, path: Path) -> bool:
     if not path.is_file():
         log.error(f'File: {path} is directory')
         return False
-    # jira.add_attachment(issue=issue, attachment=f'{path}')
+    jira.add_attachment(issue=issue, attachment=f'{path}')
     return True
 
 
