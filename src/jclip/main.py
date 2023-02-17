@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 
+from alive_progress import alive_bar
 from colorama import Fore as Clr
 from jira import JIRA, Issue
 from pylogus import logger_init
@@ -43,7 +44,7 @@ def jira_attach_file(jira: JIRA, issue: Issue, path: Path) -> bool:
     if not path.is_file():
         log.error(f'File: {path} is directory')
         return False
-    jira.add_attachment(issue=issue, attachment=f'{path}')
+    # jira.add_attachment(issue=issue, attachment=f'{path}')
     return True
 
 
@@ -76,16 +77,23 @@ def main():
         log.debug(e)
         sys.exit(1)
 
-    token = args.token if args.token else os.getenv(JIRA_TOKEN_VARIABLE)
-    if not token:
-        log.error(f'JIRA token not specified, use sys ENV variable {JIRA_TOKEN_VARIABLE} or -t key')
-        sys.exit(1)
-    if (jira := jira_auth_with_token(args.username, token)) is None:
-        sys.exit(1)
-    if (issue := jira_get_issue(jira, args.issue)) is None:
-        sys.exit(1)
-    if not jira_attach_file(jira, issue, Path(args.file)):
-        sys.exit(1)
+    with alive_bar(4) as bar:
+        token = args.token if args.token else os.getenv(JIRA_TOKEN_VARIABLE)
+        if not token:
+            log.error(f'JIRA token not specified, use sys ENV variable {JIRA_TOKEN_VARIABLE} or -t key')
+            sys.exit(1)
+        bar()
+        if (jira := jira_auth_with_token(args.username, token)) is None:
+            sys.exit(1)
+        bar()
+        if (issue := jira_get_issue(jira, args.issue)) is None:
+            sys.exit(1)
+        bar()
+        file = Path(args.file)
+        if not jira_attach_file(jira, issue, file):
+            sys.exit(1)
+        bar(1.)
+        log.info(f"{file} is successfully attached to {issue})
 
 
 if __name__ == '__main__':

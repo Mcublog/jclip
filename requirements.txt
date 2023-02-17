@@ -3,3 +3,4 @@ build>=0.10.0
 pylogus==0.1.0
 jira>=3.2.2
 colorama>=0.4.6
+alive-progress>=3.0.1
