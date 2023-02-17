@@ -93,7 +93,7 @@ def main():
         if not jira_attach_file(jira, issue, file):
             sys.exit(1)
         bar(1.)
-        log.info(f"{file} is successfully attached to {issue})
+        log.info(f"{file} is successfully attached to {issue}")
 
 
 if __name__ == '__main__':
